@@ -25,6 +25,7 @@ limitations under the License.
 #include "xla/tsl/profiler/rpc/client/profiler_client_test_util.h"
 #include "xla/tsl/profiler/rpc/profiler_server.h"
 #include "xla/tsl/profiler/utils/file_system_utils.h"
+#include "tsl/platform/host_info.h"
 #include "tsl/profiler/lib/profiler_session.h"
 #include "tsl/profiler/protobuf/profiler_service.pb.h"
 
@@ -166,8 +167,9 @@ TEST(ProfileGrpcTest, ProfileWithOverrideHostname) {
   absl::Status status = ProfileGrpc(service_addr, request, &response);
   EXPECT_TRUE(status.ok());
 
-  std::string expected_filepath = ProfilerJoinPath(
-      request.repository_root(), request.session_id(), "testhost.xplane.pb");
+  std::string expected_filepath =
+      ProfilerJoinPath(request.repository_root(), request.session_id(),
+                       absl::StrCat(tsl::port::Hostname(), ".xplane.pb"));
 
   EXPECT_TRUE(Env::Default()->FileExists(expected_filepath).ok());
 }
